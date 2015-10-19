@@ -27,7 +27,7 @@ from scapy.all import *
 from subprocess import *
 from Crypto.Cipher import AES
 CONN_IPS = {}
-MASTER_KEY = "CorrectHorseBatteryStaple"
+MASTER_KEY = "CorrectHorseBatterySta"
 
 
 # ========================================================================
@@ -43,7 +43,7 @@ MASTER_KEY = "CorrectHorseBatteryStaple"
 #           layer of encoding.
 # ========================================================================
 def encrypt_val(text):
-    secret = AES.new(MASTER_KEY[:31])
+    secret = AES.new(MASTER_KEY)
     tag_string = (str(text) + (AES.block_size - len(str(text)) % AES.block_size) * "\0")
     cipher_text = base64.b64encode(secret.encrypt(tag_string))
 
@@ -61,7 +61,7 @@ def encrypt_val(text):
 #           null characters added during encryption are stripped.
 # ========================================================================
 def decrypt_val(cipher):
-    secret = AES.new(MASTER_KEY[:31])
+    secret = AES.new(MASTER_KEY)
     decrypted = secret.decrypt(base64.b64decode(cipher))
     result = decrypted.rstrip("\0")
     return result

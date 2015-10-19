@@ -24,7 +24,7 @@ import logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)  # Surpress scapy errors
 from scapy.all import *
 from Crypto.Cipher import AES
-MASTER_KEY = "CorrectHorseBatteryStaple"  # AES master key
+MASTER_KEY = "CorrectHorseBatterySta"  # AES master key
 
 
 # ========================================================================
@@ -40,7 +40,7 @@ MASTER_KEY = "CorrectHorseBatteryStaple"  # AES master key
 #           layer of encoding.
 # ========================================================================
 def encrypt_val(text):
-    secret = AES.new(MASTER_KEY[:31])
+    secret = AES.new(MASTER_KEY)
     tag_string = (str(text) + (AES.block_size - len(str(text)) % AES.block_size) * "\0")
     cipher_text = base64.b64encode(secret.encrypt(tag_string))
     return cipher_text
@@ -57,7 +57,7 @@ def encrypt_val(text):
 #           null characters added during encryption are stripped.
 # ========================================================================
 def decrypt_val(cipher):
-    secret = AES.new(MASTER_KEY[:31])
+    secret = AES.new(MASTER_KEY)
     decrypted = secret.decrypt(base64.b64decode(cipher))
     result = decrypted.rstrip("\0")
     return result
